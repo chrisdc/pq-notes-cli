@@ -1,0 +1,36 @@
+{
+  "name": "pq-notes-cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test",
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chrisdc/pq-notes-cli.git"
+  },
+  "author": "Christopher Crouch",
+  "license": "ISC",
+  "bin": {
+    "pqn": "index.js"
+  },
+  "bugs": {
+    "url": "https://github.com/chrisdc/pq-notes-cli/issues"
+  },
+  "homepage": "https://github.com/chrisdc/pq-notes-cli#readme",
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "chrono": "^1.0.5",
+    "commander": "^2.17.1",
+    "external-editor": "^3.0.1",
+    "inquirer": "^6.1.0",
+    "inquirer-autocomplete-prompt": "^1.0.1",
+    "nanoid": "^1.2.1",
+    "pouchdb": "^7.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^5.4.0"
+  }
+}
