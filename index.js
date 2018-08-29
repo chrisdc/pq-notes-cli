@@ -4,10 +4,10 @@
 
 const program = require('commander');
 const config = require('./lib/config');
-const delete = require('./lib/delete');
+const deleteNotes = require('./lib/delete');
 const detag = require('./lib/detag');
-const export = require('./lib/export');
-const import = require('./lib/import');
+const exportNotes = require('./lib/export');
+const importNotes = require('./lib/import');
 const read = require('./lib/read');
 const rename = require('./lib/rename');
 const search = require('./lib/search');
@@ -30,7 +30,7 @@ program
   .description('Delete one or more notes.')
   .option('-f, --force', 'Delete notes without confirmation.')
   .action(function(names, options) {
-    delete(names, options);
+    deleteNotes(names, options);
   }).on('--help', function() {
     console.log('  If [name...] is empty stdin is used instead.');
     console.log('');
@@ -51,11 +51,11 @@ program
   .description('Writes the named notes to stdout in JSON format.')
   .option('-P, --pretty-print', 'Format JSON data for readability')
   .action(function(names, options) {
-    export(names, options);
+    exportNotes(names, options);
   }).on('--help', function() {
     console.log('  If [name...] is empty stdin is used instead.');
     console.log('  If stdin all notes are exported');
-    console.log('')
+    console.log('');
   });
 
 program
@@ -64,10 +64,10 @@ program
   .option('-r, --reset', 'Delete existing notes before import.')
   .option('-f, --force', 'Delete or replace exsting notes without confirmation.')
   .action(function(names, options) {
-    import(names, options);
+    importNotes(names, options);
   }).on('--help', function() {
     console.log('  If [path] is empty stdin is used instead.');
-    console.log('')
+    console.log('');
   });
 
 program
@@ -118,7 +118,7 @@ program
     console.log('');
     console.log('    --content is used if present.');
     console.log('    If --content is empty stdin is used.');
-    console.log('    If stdin is also empty notebk launches the text editor defined by $VISUAL or $ENVIRONMENT.');
+    console.log('    If stdin is also empty launch the text editor defined by $VISUAL or $ENVIRONMENT.');
     console.log('');
   });
 
