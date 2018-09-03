@@ -9,7 +9,7 @@ module.exports = {
       "error",
       "1tbs"
     ],
-    "camelcase": "error",
+    "camelcase": "off",
     "comma-dangle": [
       "error", "never"
     ],
@@ -91,6 +91,7 @@ module.exports = {
           "returns": "return"
         }
       }
-    ]
+    ],
+    "no-debugger": "off"
   }
 };
