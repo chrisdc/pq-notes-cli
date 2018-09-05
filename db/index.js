@@ -1,6 +1,3 @@
 'use strict';
-
-const PouchDB = require('pouchdb');
-var db = new PouchDB('notes');
-
-module.exports = db;
+const config = require('./config');
+module.exports = require('knex')(config);

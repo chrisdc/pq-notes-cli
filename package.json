@@ -6,7 +6,11 @@
   "scripts": {
     "test": "nyc --reporter=text --reporter=text-summary mocha",
     "lint": "eslint .",
-    "jtest": "jest --coverage"
+    "jtest": "jest --coverage",
+    "init": "knex init",
+    "migrate:make": "knex migrate:make --knexfile=./db/config.js",
+    "migrate:latest": "knex migrate:latest --knexfile=./db/config.js",
+    "tmp": "knex migrate:rollback -h"
   },
   "repository": {
     "type": "git",
@@ -28,16 +32,13 @@
     "external-editor": "^3.0.1",
     "inquirer": "^6.1.0",
     "inquirer-autocomplete-prompt": "^1.0.1",
+    "knex": "^0.15.2",
     "lunr": "^2.3.2",
     "nanoid": "^1.2.1",
-    "pouchdb": "^7.0.0"
+    "sqlite3": "^4.0.2"
   },
   "devDependencies": {
     "eslint": "^5.4.0",
-    "jest": "^23.5.0",
-    "mock-require": "^3.0.2",
-    "pouchdb-adapter-memory": "^7.0.0",
-    "pouchdb-erase": "^1.0.2",
-    "sinon": "^6.1.5"
+    "jest": "^23.5.0"
   }
 }

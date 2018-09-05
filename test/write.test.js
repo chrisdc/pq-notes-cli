@@ -2,17 +2,28 @@
 'use strict';
 
 var write = require('../lib/write');
-var setup = require('../scripts/setup-db');
+//var setup = require('../scripts/setup-db');
 //var { db, resetDB } = require('../storage');
 var db = require('../db');
-jest.mock('../db');
-
+jest.mock('../db/config');
 
 beforeAll(() => {
-  //return setup();
+  // Run migrations
+  return db.migrate.latest({
+    directory: './db/migrations',
+    tableName: 'migrations'
+  });
 });
 
+afterAll(() => {
+  // Rollback database
+  return db.migrate.rollback({
+    directory: './db/migrations',
+    tableName: 'migrations'
+  });
+});
 
+/*
 beforeEach(() => {
   return setup();
 });
@@ -23,17 +34,25 @@ afterEach(() => {
   //jest.resetModules();
   //return storage.resetDB();
 });
-
+*/
 test('Should load', () => {
   expect(typeof write).toBe('function');
 });
 
+
 test('Should use in memory database for tests', () => {
-  db.info().then((result) => {
-    expect(result.adapter).toBe('memory');
+  expect(db.client.config.connection.filename).toBe(':memory:');
+});
+
+test('Should save a note', () => {
+  return write('note title', {
+    content: 'note content'
+  }).then((res) => {
+    expect(res.ok).toBe(true);
   });
 });
 
+/*
 test('Should save a note', () => {
   return write('note title', {
     content: 'note content'
