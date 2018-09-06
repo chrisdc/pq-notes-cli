@@ -8,5 +8,15 @@ module.exports = {
   migrations: {
     tableName: 'migrations'
   },
-  useNullAsDefault: true
+  useNullAsDefault: true,
+  log: {
+    warn(message) {
+    },
+    error(message) {
+    },
+    deprecate(message) {
+    },
+    debug(message) {
+    }
+  }
 };
