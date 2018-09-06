@@ -4,7 +4,7 @@ exports.up = function(knex, Promise) {
   return Promise.all([
     knex.schema.createTable('notes', function(table) {
       table.increments();
-      table.timestamps();
+      table.timestamps(false, true);
       table.string('name').notNullable();
       table.text('content');
       table.boolean('is_deleted').defaultTo(false);
@@ -12,7 +12,7 @@ exports.up = function(knex, Promise) {
     }),
     knex.schema.createTable('tags', function(table) {
       table.increments();
-      table.timestamps();
+      table.timestamps(false, true);
       table.string('name');
       table.unique('name');
     }),
