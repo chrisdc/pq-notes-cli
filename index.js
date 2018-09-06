@@ -3,16 +3,16 @@
 'use strict';
 
 const program = require('commander');
-const config = require('./lib/config');
-const deleteNotes = require('./lib/delete');
-const detag = require('./lib/detag');
-const exportNotes = require('./lib/export');
-const importNotes = require('./lib/import');
-const read = require('./lib/read');
-const rename = require('./lib/rename');
-const search = require('./lib/search');
-const tag = require('./lib/tag');
-const write = require('./lib/write');
+const config = require('./lib/commands/config');
+const deleteNotes = require('./lib/commands/delete');
+const detag = require('./lib/commands/detag');
+const exportNotes = require('./lib/commands/export');
+const importNotes = require('./lib/commands/import');
+const read = require('./lib/commands/read');
+const rename = require('./lib/commands/rename');
+const search = require('./lib/commands/search');
+const tag = require('./lib/commands/tag');
+const write = require('./lib/commands/write');
 
 program
   .version('0.0.1')
