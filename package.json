@@ -4,13 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "nyc --reporter=text --reporter=text-summary mocha",
     "lint": "eslint .",
-    "jtest": "jest --coverage",
+    "test": "jest --coverage --collectCoverageFrom=**/*.js --collectCoverageFrom='!**/config.js' --collectCoverageFrom='!.*.js' --collectCoverageFrom='!**/db/(seeds|migrations)/*' --collectCoverageFrom='!(coverage|scripts)/**/*'",
     "init": "knex init",
     "migrate:make": "knex migrate:make --knexfile=./db/config.js",
     "migrate:latest": "knex migrate:latest --knexfile=./db/config.js",
-    "tmp": "knex migrate:rollback -h"
+    "tmp": "knex seed:make --knexfile=./db/config.js"
   },
   "repository": {
     "type": "git",
