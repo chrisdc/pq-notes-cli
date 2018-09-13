@@ -35,14 +35,6 @@ beforeEach(() => {
   });
 });
 
-/*
-afterEach(() => {
-  return db.erase();
-  //db.destroy();
-  //jest.resetModules();
-  //return storage.resetDB();
-});
-*/
 test('Should load', () => {
   expect(typeof write).toBe('function');
 });
@@ -66,7 +58,6 @@ test('Should save the correct data', () => {
   }).then((id) => {
     return db.select().from('notes').where('id', id);
   }).then((res) => {
-    //expect(res[0]).toBe({});
     expect(validDate(res[0].created_at)).toBeTruthy();
     expect(validDate(res[0].updated_at)).toBeTruthy();
     expect(res[0].name).toBe('note title 2');
@@ -95,6 +86,11 @@ test('Should be able to prepend to existing content', () => {
     expect(res[0].content).toBe('prepended content');
   });
 });
+
+/*
+test.skip('Should accept content from stdin');
+test.skip('Should accept content from editor');
+*/
 
 /*
 test('Should save a note', () => {
@@ -141,3 +137,4 @@ test('Should save the correct contents', () => {
   });
 });
 */
+
