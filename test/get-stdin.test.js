@@ -1,20 +1,19 @@
 /* eslint-env node, jest */
 'use strict';
 
-test('Should return user input', () => {
-  expect(1).toBe(1);
+const getStdin = require('../lib/prompts/get-stdin');
+
+test('Should load', () => {
+  expect(typeof getStdin).toBe('function');
 });
-/*var getTitle = require('../lib/prompts/get-name');
-var inquirer = require('inquirer');
 
-jest.mock('inquirer');
+test('Should return the contents of stdin', () => {
+  var input = 'Some example text';
 
-test('Should return user input', () => {
-  const resp = Promise.resolve('Example title');
-  inquirer.prompt.mockResolvedValue(resp);
+  process.stdin.push(input);
+  process.stdin.push(null);
 
-  return getTitle().then((res) => {
-    expect(res).toBe('Example title');
+  return getStdin().then((content) => {
+    expect(content.toString()).toBe(input);
   });
 });
-*/
