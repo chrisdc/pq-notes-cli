@@ -18,13 +18,9 @@ function __setCleanupError(error) {
   cleanupErr = error;
 }
 
-function __reset() {
+function __resetErrors() {
   err = null;
   cleanupErr = null;
-}
-
-function __get() {
-  return cleanupErr;
 }
 
 const mockRun = jest.fn().mockImplementation(() => {
@@ -35,11 +31,10 @@ const mockRun = jest.fn().mockImplementation(() => {
 });
 
 const mockCleanup = jest.fn().mockImplementation(() => {
-  throw new Error('jj');
   if (cleanupErr) {
     throw cleanupErr;
   }
-  return;
+  return true;
 });
 
 const mock = jest.fn().mockImplementation(() => {
@@ -52,8 +47,7 @@ const mock = jest.fn().mockImplementation(() => {
 editorParent.__setInput = __setInput;
 editorParent.__setError = __setError;
 editorParent.__setCleanupError = __setCleanupError;
-editorParent.__reset = __reset;
-editorParent.__get = __get;
+editorParent.__resetErrors = __resetErrors;
 editorParent.ExternalEditor = mock;
 
 module.exports = editorParent;

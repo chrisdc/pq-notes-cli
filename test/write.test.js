@@ -2,10 +2,15 @@
 'use strict';
 
 var write = require('../lib/commands/write');
+var openEditor = require('../lib/prompts/open-editor');
 //var setup = require('../scripts/setup-db');
 //var { db, resetDB } = require('../storage');
 var db = require('../db');
+var getStdin = require('../lib/prompts/get-stdin');
+
 jest.mock('../db/config');
+jest.mock('../lib/prompts/open-editor');
+jest.mock('../lib/prompts/get-stdin');
 
 function validDate(timeStamp) {
   var date = new Date(timeStamp);
@@ -84,6 +89,44 @@ test('Should be able to prepend to existing content', () => {
     return db.select().from('notes').where('id', id);
   }).then((res) => {
     expect(res[0].content).toBe('prepended content');
+  });
+});
+
+test('Should use --content if available', () => {
+  expect(1).toBe(1);
+});
+
+test('Should use stdin if --content is not available', () => {
+  getStdin.mockResolvedValue('Content from stdin');
+  process.stdin.isTTY = false;
+  console.log(!process.stdin.isTTY);
+  console.log(getStdin());
+
+  return write('note title3', {
+  }).then((id) => {
+    return db.select().from('notes').where('id', id);
+  }).then((res) => {
+    //console.log(openEditor.mock);
+    //expect(openEditor).toHaveBeenCalledTimes(1);
+    //expect(res[0].content).toBe('Content from stdin');
+    expect(getStdin).toHaveBeenCalledTimes(1);
+    expect(res[0]).toBe({});
+  });
+});
+
+test('Should open an editor if both --conent and stdin are unavailable', () => {
+  openEditor.mockReturnValue('Content from editor');
+  process.stdin.isTTY = true;
+
+  console.log('gg');
+
+  return write('note title2', {
+  }).then((id) => {
+    return db.select().from('notes').where('id', id);
+  }).then((res) => {
+    //console.log(openEditor.mock);
+    expect(openEditor).toHaveBeenCalledTimes(1);
+    expect(res[0].content).toBe('Content from editor');
   });
 });
 

@@ -6,7 +6,7 @@ const {
   __setInput,
   __setError,
   __setCleanupError,
-  __reset, __get,
+  __resetErrors,
   ExternalEditor,
   CreateFileError,
   ReadFileError,
@@ -15,22 +15,14 @@ const {
 } = require('external-editor');
 
 var editor = new ExternalEditor();
-/*
-global.console = {
-  warn: jest.fn(),
-  log: jest.fn()
-};*/
 
 const console = global.console;
 
 afterEach(() => {
   ExternalEditor.mockClear();
-  editor.cleanup.mockReset();
-  __reset();
-  //editor.run.mockReset();
-});
-
-afterAll(() => {
+  editor.cleanup.mockClear();
+  editor.run.mockClear();
+  __resetErrors();
   global.console = console;
 });
 
@@ -49,53 +41,51 @@ test('Should pass existing content to editor', () => {
   expect(ExternalEditor.mock.calls[0][0]).toBe('Initial Content');
 });
 
-test('Should return an error when external-editor can\'t create file', () => {
+test('Should throw an error when external-editor can\'t create file', () => {
   __setError(new CreateFileError());
   expect(() => openEditor()).toThrow('Failed to create the temporary file');
 });
 
-test('Should return an error when external-editor can\'t read the file', () => {
+test('Should throw an error when external-editor can\'t read the file', () => {
   __setError(new ReadFileError());
   expect(() => openEditor()).toThrow('Failed to read the temporary file');
 });
 
-test('Should return an error when external-editor can\'t open the editor', () => {
+test('Should throw an error when external-editor can\'t open the editor', () => {
   __setError(new LaunchEditorError());
   expect(() => openEditor()).toThrow('Failed to launch your editor');
 });
 
+test('Should throw any other errors from editor.run()', () => {
+  __setError(new Error('Test Error'));
+  expect(() => openEditor()).toThrow('Test Error');
+});
+
 test('Should attempt to cleanup after an error', () => {
-  __setError(new CreateFileError());
+  __setError(new ReadFileError());
 
   try {
     openEditor();
   } catch (err) {
-    //expect(editor.cleanup.mock.calls.length).toBe(1);
     expect(editor.cleanup).toHaveBeenCalledTimes(1);
   }
 });
 
-test('Should report a failure to cleanup', () => {
-  /*const logMock = jest.fn();
-  global.console = () => ({
-    log: logMock
-  });*/
+test('Should display an error if the temporary file cannot be deleted.', () => {
+  const logMock = jest.fn();
 
-  __setCleanupError(new Error('gg'));
-  //openEditor();
-  console.log(editor.cleanup.mock);
-  //expect(1).toBe(1);
+  Object.defineProperty(global.console, 'log', {
+    value: logMock
+  });
 
-  expect(() => openEditor()).toThrow();
+  __setCleanupError(new RemoveFileError());
 
+  openEditor();
 
-  //openEditor();
+  expect(logMock).toBeCalledWith('Failed to remove the temporary file');
+});
 
-  //expect(editor.cleanup).toHaveBeenCalledTimes(1);
-  //expect(logMock).toBeCalled();
-
-
-  //expect(() => openEditor()).toThrow('Failed to remove the temporary file');
-  //console['log'] = jest.fn();
-  //expect(console.log).toHaveBeenCalledWith('Failed to remove the temporary file');
+test('Should throw other errors from editor.cleanup', () => {
+  __setCleanupError(new Error('Test Error'));
+  expect(() => openEditor()).toThrow('Test Error');
 });
