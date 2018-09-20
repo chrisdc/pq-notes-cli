@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "jest --coverage --collectCoverageFrom=**/*.js --collectCoverageFrom='!**/config.js' --collectCoverageFrom='!.*.js' --collectCoverageFrom='!**/db/(seeds|migrations)/*' --collectCoverageFrom='!(coverage|scripts)/**/*'",
+    "test": "jest",
     "init": "knex init",
     "migrate:make": "knex migrate:make --knexfile=./db/config.js",
     "migrate:latest": "knex migrate:latest --knexfile=./db/config.js",
@@ -41,6 +41,17 @@
     "jest": "^23.5.0"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "clearMocks": true,
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "**/*.js",
+      "!**/config.js",
+      "!.*.js",
+      "!**/db/seeds/*",
+      "!**/db/migrations/*",
+      "!coverage/**/*",
+      "!scripts/**/*"
+    ]
   }
 }
