@@ -40,6 +40,10 @@ beforeEach(() => {
   });
 });
 
+afterEach(() => {
+  openEditor.mockClear();
+});
+
 test('Should load', () => {
   expect(typeof write).toBe('function');
 });
@@ -100,7 +104,7 @@ test('Should use stdin if --content is not available', () => {
   getStdin.mockResolvedValue('Content from stdin');
   process.stdin.isTTY = false;
   console.log(!process.stdin.isTTY);
-  console.log(getStdin());
+  //console.log(getStdin());
 
   return write('note title3', {
   }).then((id) => {
@@ -117,8 +121,6 @@ test('Should use stdin if --content is not available', () => {
 test('Should open an editor if both --conent and stdin are unavailable', () => {
   openEditor.mockReturnValue('Content from editor');
   process.stdin.isTTY = true;
-
-  console.log('gg');
 
   return write('note title2', {
   }).then((id) => {
