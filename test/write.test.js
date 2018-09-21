@@ -3,14 +3,18 @@
 
 var write = require('../lib/commands/write');
 var openEditor = require('../lib/prompts/open-editor');
-//var setup = require('../scripts/setup-db');
-//var { db, resetDB } = require('../storage');
 var db = require('../db');
 var getStdin = require('../lib/prompts/get-stdin');
+var getConfirmation = require('../lib/prompts/get-confirmation');
+var getName = require('../lib/prompts/get-name');
+
+const console = global.console;
 
 jest.mock('../db/config');
 jest.mock('../lib/prompts/open-editor');
 jest.mock('../lib/prompts/get-stdin');
+jest.mock('../lib/prompts/get-confirmation');
+jest.mock('../lib/prompts/get-name');
 
 function validDate(timeStamp) {
   var date = new Date(timeStamp);
@@ -33,27 +37,27 @@ afterAll(() => {
   });
 });
 
-
 beforeEach(() => {
+  // Reseed the database.
   return db.seed.run({
     directory: './db/seeds'
   });
 });
 
 afterEach(() => {
-  openEditor.mockClear();
+  jest.clearAllMocks();
+  global.console = console;
 });
 
 test('Should load', () => {
   expect(typeof write).toBe('function');
 });
 
-
 test('Should use in memory database for tests', () => {
   expect(db.client.config.connection.filename).toBe(':memory:');
 });
 
-test('Should save a note', () => {
+test('Should return an ID', () => {
   return write('note title', {
     content: 'note content'
   }).then((res) => {
@@ -61,16 +65,75 @@ test('Should save a note', () => {
   });
 });
 
-test('Should save the correct data', () => {
-  return write('note title 2', {
+test('Should save a note', () => {
+  return write('note title', {
     content: 'note content'
   }).then((id) => {
     return db.select().from('notes').where('id', id);
   }).then((res) => {
     expect(validDate(res[0].created_at)).toBeTruthy();
     expect(validDate(res[0].updated_at)).toBeTruthy();
-    expect(res[0].name).toBe('note title 2');
+    expect(res[0].name).toBe('note title');
     expect(res[0].content).toBe('note content');
+  });
+});
+
+test('Should request a title if one is not provided', () => {
+  getName.mockResolvedValue('Note title');
+
+  return write(null, {
+    content: 'note content'
+  }).then(() => {
+    expect(getName).toHaveBeenCalledTimes(1);
+  });
+});
+
+test('Should update an existing note with the same title', () => {
+  getConfirmation.mockResolvedValue(true);
+  var firstID;
+
+  return write('note title', {
+    content: 'note content'
+  }).then((id) => {
+    firstID = id;
+    return write('note title', {
+      content: 'Updated content'
+    });
+  }).then(() => {
+    return db.select().from('notes').where('id', firstID);
+  }).then((res) => {
+    expect(res[0].name).toBe('note title');
+    expect(res[0].content).toBe('Updated content');
+  });
+});
+
+test('Should use --content if available', () => {
+  expect(1).toBe(1);
+});
+
+test('Should use stdin if --content is not available', () => {
+  getStdin.mockResolvedValue('Content from stdin');
+  process.stdin.isTTY = false;
+
+  return write('note title', {
+  }).then((id) => {
+    return db.select().from('notes').where('id', id);
+  }).then((res) => {
+    expect(getStdin).toHaveBeenCalledTimes(1);
+    expect(res[0].content).toBe('Content from stdin');
+  });
+});
+
+test('Should open an editor if both --conent and stdin are unavailable', () => {
+  openEditor.mockReturnValue('Content from editor');
+  process.stdin.isTTY = true;
+
+  return write('note title', {
+  }).then((id) => {
+    return db.select().from('notes').where('id', id);
+  }).then((res) => {
+    expect(openEditor).toHaveBeenCalledTimes(1);
+    expect(res[0].content).toBe('Content from editor');
   });
 });
 
@@ -96,90 +159,46 @@ test('Should be able to prepend to existing content', () => {
   });
 });
 
-test('Should use --content if available', () => {
-  expect(1).toBe(1);
-});
+test('Should seek confirmation before overwriting a note', () => {
+  getConfirmation.mockResolvedValue(true);
+  var firstID;
 
-test('Should use stdin if --content is not available', () => {
-  getStdin.mockResolvedValue('Content from stdin');
-  process.stdin.isTTY = false;
-  console.log(!process.stdin.isTTY);
-  //console.log(getStdin());
-
-  return write('note title3', {
+  return write('note title', {
+    content: 'note content'
   }).then((id) => {
-    return db.select().from('notes').where('id', id);
-  }).then((res) => {
-    //console.log(openEditor.mock);
-    //expect(openEditor).toHaveBeenCalledTimes(1);
-    //expect(res[0].content).toBe('Content from stdin');
-    expect(getStdin).toHaveBeenCalledTimes(1);
-    expect(res[0]).toBe({});
-  });
-});
-
-test('Should open an editor if both --conent and stdin are unavailable', () => {
-  openEditor.mockReturnValue('Content from editor');
-  process.stdin.isTTY = true;
-
-  return write('note title2', {
+    firstID = id;
+    return write('note title', {
+      content: 'Updated content'
+    });
   }).then((id) => {
-    return db.select().from('notes').where('id', id);
-  }).then((res) => {
-    //console.log(openEditor.mock);
-    expect(openEditor).toHaveBeenCalledTimes(1);
-    expect(res[0].content).toBe('Content from editor');
+    expect(getConfirmation).toHaveBeenCalledTimes(1);
+    expect(id).toBe(firstID);
   });
 });
 
-/*
-test.skip('Should accept content from stdin');
-test.skip('Should accept content from editor');
-*/
+test('Should report an error if the user does not confirm overwrite', () => {
+  getConfirmation.mockResolvedValue(false);
 
-/*
-test('Should save a note', () => {
-  return write('note title', {
-    content: 'note content'
-  }).then((res) => {
-    expect(res.ok).toBe(true);
-  });
-});
+  /*const logMock = jest.fn();
 
-test('Should save the correct data', () => {
-  return write('note title', {
-    content: 'note content'
-  }).then((res) => {
-    return db.get(res.id);
-  }).then((res) => {
-    expect(res.name).toBe('note title');
-    expect(res.content).toBe('note content');
-  });
-});
+  Object.defineProperty(global.console, 'log', {
+    value: logMock
+  });*/
 
-test('Should save the correct data2', () => {
-  return write('note title', {
-    content: 'note content'
-  }).then((res) => {
-    return db.get(res.id);
-  }).then((res) => {
-    expect(res.name).toBe('note title');
-    expect(res.content).toBe('note content');
-  });
-});
-
-/*
-test('Should save the correct contents', () => {
   return write('note title', {
     content: 'note content'
   }).then(() => {
-    return db.query('name_index', {
-      key: 'note title',
-      include_docs : true
+    return write('note title', {
+      content: 'Updated content2'
     });
-  }).then((res) => {
-    expect(res.rows[0].doc.name).toBe('note title');
+  }).catch((err) => {
+    // Expect error to have been displayed.
+    expect(getConfirmation).toHaveBeenCalledTimes(1);
+    expect(err).toBe({});
+    //expect(logMock).toBeCalledWith('Failed to remove the temporary file');
   });
 });
-*/
 
+test('Should report any other errors', () => {
+
+});
