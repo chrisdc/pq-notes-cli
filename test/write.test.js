@@ -179,26 +179,65 @@ test('Should seek confirmation before overwriting a note', () => {
 test('Should report an error if the user does not confirm overwrite', () => {
   getConfirmation.mockResolvedValue(false);
 
-  /*const logMock = jest.fn();
+  const warnMock = jest.fn();
 
-  Object.defineProperty(global.console, 'log', {
-    value: logMock
-  });*/
+  Object.defineProperty(global.console, 'warn', {
+    value: warnMock
+  });
 
   return write('note title', {
     content: 'note content'
   }).then(() => {
     return write('note title', {
-      content: 'Updated content2'
+      content: 'Updated content'
     });
-  }).catch((err) => {
+  }).then(() => {
     // Expect error to have been displayed.
     expect(getConfirmation).toHaveBeenCalledTimes(1);
-    expect(err).toBe({});
-    //expect(logMock).toBeCalledWith('Failed to remove the temporary file');
+    //expect(err).toBe({});
+    expect(warnMock).toBeCalledWith('Update cancelled');
   });
 });
 
 test('Should report any other errors', () => {
 
+});
+
+test('Should not seek confirmation if --force option is used', () => {
+  return write('note title', {
+    content: 'note content'
+  }).then(() => {
+    return write('note title', {
+      content: 'Updated content',
+      force: true
+    });
+  }).then(() => {
+    expect(getConfirmation).toHaveBeenCalledTimes(0);
+  });
+});
+
+test('Should not seek confirmation if --prepend option is used', () => {
+  return write('note title', {
+    content: 'note content'
+  }).then(() => {
+    return write('note title', {
+      content: 'Updated content',
+      prepend: true
+    });
+  }).then(() => {
+    expect(getConfirmation).toHaveBeenCalledTimes(0);
+  });
+});
+
+test('Should not seek confirmation if --append option is used', () => {
+  return write('note title', {
+    content: 'note content'
+  }).then(() => {
+    return write('note title', {
+      content: 'Updated content',
+      append: true
+    });
+  }).then(() => {
+    expect(getConfirmation).toHaveBeenCalledTimes(0);
+  });
 });
