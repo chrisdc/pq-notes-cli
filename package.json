@@ -33,7 +33,6 @@
     "inquirer-autocomplete-prompt": "^1.0.1",
     "knex": "^0.15.2",
     "lunr": "^2.3.3",
-    "nanoid": "^1.2.3",
     "sqlite3": "^4.0.2"
   },
   "devDependencies": {
